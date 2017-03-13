@@ -2,7 +2,7 @@ fn = 50;
 
 
 // MIC PARAMETERS
-main_width = 47.22; // mm
+main_width = 48; // mm
 mountable_height = 73; // mm
 
 mount_width = 41.35; // mm
@@ -29,7 +29,7 @@ rod_cap_d = 7.8;
 rod_cap_h = 5.1;
 
 // INTEGRATION PARAMS
-rod_distance = 30;
+rod_distance = 35;
 
 
 module mount_rod() {
@@ -37,8 +37,10 @@ module mount_rod() {
   cylinder(d = rod_diameter, h=top_mount_h + bot_mount_h + no_mount_h, $fn=fn);
 
   color([1, 1, 0, 0.5])
+  color("yellow")
   translate([0, 0, rod_height])
   scale([1, 1, rod_cap_h / rod_cap_d])
+
   hull() {
     sphere(d = rod_cap_d, $fn=fn);
     translate([0, 0, -1 * mountable_height]) 
@@ -49,7 +51,7 @@ module mount_rod() {
 }
 
 module removal_slot() {
-  how_far_back = (-1 * rod_diameter / 2) + 1.8;
+  how_far_back = (-1 * rod_diameter / 2) - 1.5;
 
   color("red")
   hull () {
@@ -116,14 +118,18 @@ module filledMicMount() {
 
 module mount_connector() {
   color([0, 1, 0, 0.5])
-  translate([main_width / 3.5, 0, -2])
-  cylinder(d = main_width / 2, h = mountable_height);
+  translate([0, 0, -2])
+  cylinder(d = main_width + 2, h = mountable_height);
 }
 
 module filled_top_rod_mount() {
   translate([0, 0, rod_height - top_mount_h - 1])
   scale([1, 1, rod_cap_h / rod_cap_d])
-  sphere(d = rod_diameter + 5);
+  hull() {
+    sphere(d = rod_cap_d + 4);
+    translate([0, 0, -5])
+    sphere(d = rod_cap_d + 4);
+  }
 }
 
 module filled_bot_rod_mount() {
@@ -142,8 +148,7 @@ module micMount() {
   }
 }
 
-color("white")
-micMount();
+// micMount();
 
-mic();
+ mic();
 
