@@ -1,4 +1,4 @@
-fn = 50;
+fn = 100;
 
 
 // MIC PARAMETERS
@@ -12,6 +12,7 @@ bottom_width = 30.27; // mm
 taper_height = 10.8; // mm
 
 screw_holder_h = 18;
+screw_holder_shaft_d = 26;
 screw_holder_d = 35;
 
 
@@ -55,18 +56,18 @@ module removal_slot() {
 
   color("red")
   hull () {
-    translate([0, 0, rod_height - mountable_height - taper_height])
+    translate([0, 0, rod_height - mountable_height - taper_height * 2])
     cylinder(d = rod_diameter + 0.2, h=mountable_height);
 
-    translate([how_far_back, 0, rod_height - mountable_height - taper_height])
+    translate([how_far_back, 0, rod_height - mountable_height - taper_height * 2])
     cylinder(d = rod_diameter + 0.2, h=mountable_height);
   }
 
   hull () {
-    translate([how_far_back, 0, rod_height - mountable_height - taper_height])
+    translate([how_far_back, 0, rod_height - mountable_height - taper_height * 2])
     cylinder(d = rod_diameter + 0.2, h=mountable_height);
 
-    translate([-1 * rod_diameter, 30, rod_height - mountable_height - taper_height])
+    translate([-1 * rod_diameter, 30, rod_height - mountable_height - taper_height * 2])
     cylinder(d = rod_diameter + 0.2, h=mountable_height);
   }
 }
@@ -85,8 +86,12 @@ module mic() {
   translate([0, 0, -1 * (mount_height + taper_height)])
   cylinder(d2 = mount_width, d1 = bottom_width, h = taper_height, $fn=fn);
 
+  // mount gap
+  translate([0, 0, -1 * (mount_height * 2 + taper_height)])
+  cylinder(d = screw_holder_shaft_d, h = mount_height, $fn=fn);
+
   // screw on part
-  translate([0, 0, -1 * (mount_height * 4 + taper_height)])
+  translate([0, 0, -1 * (mount_height * 2 + taper_height + screw_holder_h)])
   cylinder(d = screw_holder_d, h = screw_holder_h, $fn=fn);
 
   translate([rod_distance, 0, -1 * (rod_height - mountable_height + rod_cap_d - 2)])
@@ -148,7 +153,8 @@ module micMount() {
   }
 }
 
-// micMount();
+micMount();
 
- mic();
+// mic();
 
+// cube([100,100,100]);
