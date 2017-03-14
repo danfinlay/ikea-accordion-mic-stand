@@ -12,7 +12,7 @@ bottom_width = 30.27; // mm
 taper_height = 10.8; // mm
 
 screw_holder_h = 18;
-screw_holder_shaft_d = 26;
+screw_holder_shaft_d = 28;
 screw_holder_d = 35;
 
 cover_thickness = 2; // mm
@@ -28,7 +28,7 @@ no_mount_h = rod_height - top_mount_h - bot_mount_h; // mm
 rod_screw_d = 12;
 rod_screw_h = 3.1;
 
-rod_cap_d = 7.8;
+rod_cap_d = 8.2;
 rod_cap_h = 5.1;
 
 // INTEGRATION PARAMS
@@ -54,7 +54,7 @@ module mount_rod() {
 }
 
 module removal_slot() {
-  how_far_back = (-1 * rod_diameter / 2) - 1.5;
+  how_far_back = (rod_diameter * 2) - 1.5;
 
   color("red")
   hull () {
@@ -102,6 +102,13 @@ module mic() {
 
 module filledMicMount() {
 
+  // The bottom half-sphere
+  difference() {
+    sphere(d= main_width + cover_thickness, $fn=fn);
+    mic();
+  }
+
+  // The union between the bottom half sphere and the rod mount
   hull() {
     translate([0, 0, -1 * (taper_height + mount_height)])
     filled_bot_rod_mount();
@@ -109,6 +116,9 @@ module filledMicMount() {
     difference() {
       sphere(d= main_width + cover_thickness, $fn=fn);
       mic();
+
+      translate([0, 0, 50 - mount_height])
+      cube([100, 100, 100], center=true);
     }
   }
 
@@ -123,10 +133,12 @@ module filledMicMount() {
   mount_connector();
 }
 
+// The center surrounding cylinder for the mic,
+// keeps the two mounting points spaced correctly.
 module mount_connector() {
   color([0, 1, 0, 0.5])
-  translate([0, 0, -2])
-  cylinder(d = main_width + 2, h = mountable_height, $fn=fn);
+  translate([0, 0, -2 + mount_height])
+  cylinder(d = main_width + cover_thickness, h = mountable_height - mount_height, $fn=fn);
 }
 
 module filled_top_rod_mount() {
@@ -134,13 +146,13 @@ module filled_top_rod_mount() {
   scale([1, 1, rod_cap_h / rod_cap_d])
   hull() {
     sphere(d = rod_cap_d + 4, $fn=fn);
-    translate([0, 0, -5])
+    translate([0, 0, -10])
     sphere(d = rod_cap_d + 4, $fn=fn);
   }
 }
 
 module filled_bot_rod_mount() {
-  translate([rod_distance, 0, 0])
+  translate([rod_distance, 0, -1 * mount_height])
   cylinder(d = rod_diameter + 4, h = taper_height + mount_height, $fn=fn);
 }
 
@@ -155,7 +167,34 @@ module micMount() {
   }
 }
 
+module torus(r=4, h=2) {
+  rotate_extrude(angle=360, convexity=2)
+  translate([r,0,0])
+  circle(d=h, $fn=fn);
+}
+
+module inverseTorus(r=4, h=2) {
+  difference() {
+    cylinder(r=r, h=h, center=true, $fn=fn);
+    torus(h=h, r=r);
+  }
+}
+
+module rubberBandMount () {
+  translate([30, 10, -1 * mount_height * 2.5])
+  rotate(v=[1, -0.7, 0], a=90)
+  inverseTorus(h=3, r=5);
+}
+
+module rubberBandMounts () {
+  rubberBandMount();
+
+  mirror([0,1,0])
+  rubberBandMount();
+}
+
 micMount();
+rubberBandMounts();
 
 // mic();
 
